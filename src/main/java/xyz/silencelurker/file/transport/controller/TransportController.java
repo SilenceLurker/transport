@@ -1,9 +1,11 @@
 package xyz.silencelurker.file.transport.controller;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.annotation.Resource;
@@ -55,5 +57,21 @@ public class TransportController {
         transportItemService.saveFileWithKey(transportItem.getData(), transportItem.getFileName(), key);
         return key;
 
+    }
+
+    @GetMapping("/data")
+    String getData(@RequestParam(required = false) String key) {
+        if (key == null || key.isEmpty()) {
+            return new String(transportItemService.getData());
+        }
+        return new String(transportItemService.getDataByKey(key));
+    }
+
+    @GetMapping("/fileName")
+    String getFileName(@RequestParam(required = false) String key) {
+        if (key == null || key.isEmpty()) {
+            return transportItemService.getFileName();
+        }
+        return transportItemService.getFileNameByKey(key);
     }
 }
