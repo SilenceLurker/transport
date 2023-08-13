@@ -9,7 +9,16 @@ package xyz.silencelurker.file.transport.type;
  * @author Silence_lurker
  */
 public enum Type {
+    /**
+     * 文件类型传递
+     */
     File,
+    /**
+     * 文件夹类型传递
+     */
     Folder,
+    /**
+     * 字符串类型
+     */
     String
 }

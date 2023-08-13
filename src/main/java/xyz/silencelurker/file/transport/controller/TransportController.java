@@ -42,6 +42,8 @@ public class TransportController {
             itemType = Type.Folder;
         } else if (TYPE_FILE.equalsIgnoreCase(type)) {
             itemType = Type.File;
+        } else if (TYPE_STRING.equalsIgnoreCase(type)) {
+            itemType = Type.String;
         } else {
             itemType = Type.String;
         }
