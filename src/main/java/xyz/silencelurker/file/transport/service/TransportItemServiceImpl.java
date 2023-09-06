@@ -19,6 +19,8 @@ public class TransportItemServiceImpl implements ITransportItemService {
     private static final String DEFAULT_KEY_DATA = "DEFAULT_KEY_WITH_VERSION0.0.1_FOR_DATA";
     private static final String DEFAULT_KEY_FILENAME = "DEFAULT_KEY_WITH_VERSION0.0.1_FOR_FILENAME";
 
+    private static final String DEFAULT_LOCATION = "./";
+
     private static final String DATA_TITLE = "_FOR_DATA";
     private static final String FILENAME_TITLE = "_FOR_FILENAME";
 
