@@ -17,6 +17,7 @@ Param:
 | 参数名 | 参数类型 | 是否必须 | 描述 |
 | -- | -- | -- | -- |
 | location | String | false | 缓存目录下相对位置(若不存在则自动创建)，例："test/" |
+| replace | boolean | false | 是否替换文件 |
 
 Body:
 
@@ -34,10 +35,22 @@ Param:
 
 | 参数名 | 参数类型 | 是否必须 | 描述 |
 | -- | -- | -- | -- |
-| location | String | false | 缓存目录下相对位置(若不存在则自动创建)，例："test/" |
+| location | String | false | 缓存目录下相对位置(若不存在则自动创建)，例："test/"。默认值："null/" |
 | fileName | String | false | 目标文件名 |
 
 #### /getFile
+
+GET /transport/getFile
+
+Param:
+
+| 参数名 | 参数类型 | 是否必须 | 描述 |
+| -- | -- | -- | -- |
+| location | String | false | 缓存目录下相对位置(若不存在则自动创建)，例："test/"。默认值："" |
+| fileName | String | false | 目标文件名 |
+| download | boolean | false | 是否进行下载(默认值：false) |
+
+#### /getDirInfo
 
 GET /transport/
 
@@ -45,5 +58,4 @@ Param:
 
 | 参数名 | 参数类型 | 是否必须 | 描述 |
 | -- | -- | -- | -- |
-| location | String | false | 缓存目录下相对位置(若不存在则自动创建)，例："test/" |
-| fileName | String | false | 目标文件名 |
+| location | String | false | 缓存目录下相对位置(若不存在则自动创建)，例："test/"。默认值："" |

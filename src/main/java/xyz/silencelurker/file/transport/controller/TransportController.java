@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -11,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -63,7 +66,8 @@ public class TransportController {
     }
 
     @PostMapping("/uploadFile")
-    public ResponseEntity<String> uploadFile(@RequestParam(required = false) String location, MultipartFile file)
+    public ResponseEntity<String> uploadFile(@RequestParam(required = false) String location,
+            @RequestParam(required = false, defaultValue = "false") boolean replace, MultipartFile file)
             throws IOException {
 
         log.info("上传文件请求接收。");
@@ -84,7 +88,11 @@ public class TransportController {
             target = new File(DEFAULT_LOCATION + location + file.getOriginalFilename());
         }
         if (target.exists()) {
-            return ResponseEntity.badRequest().body("File Already Exists!");
+            if (replace) {
+                log.info("确认文件替换");
+            } else {
+                return ResponseEntity.badRequest().body("File Already Exists!");
+            }
         }
 
         var stream = file.getInputStream();
@@ -104,16 +112,23 @@ public class TransportController {
     }
 
     @DeleteMapping("/deleteFile")
-    public ResponseEntity<String> deleteFile(@RequestParam(required = false) String location,
-            @RequestParam(required = false) String fileName) {
+    public ResponseEntity<String> deleteFile(@RequestParam(required = false, defaultValue = "null/") String location,
+            @RequestParam(required = false, defaultValue = "NOT_EXISTS_FILE.FAIL") String fileName) {
 
-        // TODO: Not Support Now!
-        return ResponseEntity.ok().body("Delete Success!(Testing)");
+        File target = new File(DEFAULT_LOCATION + location + fileName);
+
+        if (target.exists()) {
+            target.delete();
+            return ResponseEntity.ok().body("Delete Compile!");
+        }
+
+        return ResponseEntity.badRequest().body("Delete Fail, File not Exists!");
     }
 
     @GetMapping("/getFile")
-    public ResponseEntity<Resource> getFile(@RequestParam(required = false) String location,
-            @RequestParam(required = false) String fileName) {
+    public ResponseEntity<Resource> getFile(@RequestParam(required = false, defaultValue = "") String location,
+            @RequestParam(required = false, defaultValue = "NOT_EXISTS_FILE.FAIL") String fileName,
+            @RequestParam(required = false, defaultValue = "false") boolean download) {
         FileSystemResource file;
 
         log.info("检查目标文件信息");
@@ -146,7 +161,60 @@ public class TransportController {
             type = MediaType.TEXT_HTML;
         }
 
+        if (download) {
+            type = MediaType.MULTIPART_FORM_DATA;
+        }
+
         return ResponseEntity.ok().contentType(type).body(file);
+    }
+
+    @GetMapping("/getDirInfo")
+    public ResponseEntity<?> getDirInfo(@RequestParam(required = false, defaultValue = "") String location) {
+        File target = new File(DEFAULT_LOCATION + location);
+
+        String[] fileList;
+        List<String> list = new ArrayList<String>();
+
+        if (!target.exists()) {
+            return ResponseEntity.badRequest().body("目录不存在");
+        }
+
+        if (target.isDirectory()) {
+            fileList = target.list();
+        } else {
+            return ResponseEntity.ok().body(target);
+        }
+
+        for (var str : fileList) {
+            var s = new File(DEFAULT_LOCATION + str);
+
+            if (s.isDirectory()) {
+                str += "/";
+            }
+
+            list.add(str);
+        }
+
+        return ResponseEntity.ok().body(list);
+
+    }
+
+    @GetMapping("/download/{fileName}")
+    public ResponseEntity<?> download(@PathVariable String fileName,
+            @RequestParam(required = false, defaultValue = "") String location) {
+        MediaType type = MediaType.MULTIPART_FORM_DATA;
+
+        File file = new File(location + fileName);
+
+        if (!file.exists()) {
+            return ResponseEntity.badRequest().body("File Not Exists!");
+        }
+
+        var resource = new FileSystemResource(file);
+
+        log.info(resource.getFilename());
+
+        return ResponseEntity.ok().contentType(type).body(resource);
     }
 
 }
